@@ -14,7 +14,12 @@ const inputElevation = document.querySelector('.form__input--elevation');
 // Check if geolocation exists
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(function (position) {
-    console.log(position);
+    // console.log(position);
+
+    // take coord out of object
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
   }, function () {
     alert('Could not get your position')
   })
