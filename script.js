@@ -19,9 +19,19 @@ let mapEvent;
 
 
 class App {
-  constructor() {
+  // # means private instance properties
+  #map;
+  #mapEvent;
 
+
+  constructor() {
+    this._getPosition();
   }
+  /**
+   * 
+   * 10 REFACTOR - 10:16
+   * 
+   */
 
   _getPosition() {
     // Check if geolocation exists
@@ -43,8 +53,8 @@ class App {
 
     const coords = [latitude, longitude]
 
-    // Leaflet map
-    map = L.map('map').setView(coords, 13);
+    // Leaflet map api.... #map is like a properrty that is now defined on the object itself
+    this.#map = L.map('map').setView(coords, 13);
     // console.log(map);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -80,12 +90,16 @@ class App {
   }
 
 
-
-
 }
 
 
 
+
+// instantiate app so we can call it
+const app = new App();
+
+// call the app with position prop to get location
+app._getPosition();
 
 
 
