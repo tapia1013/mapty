@@ -17,10 +17,24 @@ let map;
 let mapEvent;
 
 
-// Check if geolocation exists
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(function (position) {
-    // console.log(position);
+
+class App {
+  constructor() {
+
+  }
+
+  _getPosition() {
+    // Check if geolocation exists
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(this._loadMap, function () {
+        alert('Could not get your position');
+      })
+    };
+
+  }
+
+
+  _loadMap(position) {
 
     // take coord out of object
     const { latitude } = position.coords;
@@ -48,10 +62,34 @@ if (navigator.geolocation) {
 
     })
 
-  }, function () {
-    alert('Could not get your position');
-  })
-};
+  }
+
+
+  _showForm() {
+
+  }
+
+
+  _toggleElevationField() {
+
+  }
+
+
+  _newWorkour() {
+
+  }
+
+
+
+
+}
+
+
+
+
+
+
+
 
 
 
