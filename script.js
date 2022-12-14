@@ -12,10 +12,9 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 
-// map global variable
-let map;
-let mapEvent;
-
+// // map global variable
+// let map;
+// let mapEvent;
 
 
 class App {
@@ -23,20 +22,21 @@ class App {
   #map;
   #mapEvent;
 
-
+  // constructor get automatically called when its loaded
   constructor() {
     this._getPosition();
+
+    // listen to submit form
+    form.addEventListener('submit', this._newWorkout.bind(this))
+
+    inputType.addEventListener('change', this._toggleElevationField)
   }
-  /**
-   * 
-   * 10 REFACTOR - 10:16
-   * 
-   */
+
 
   _getPosition() {
     // Check if geolocation exists
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(this._loadMap, function () {
+      navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), function () {
         alert('Could not get your position');
       })
     };
@@ -51,42 +51,65 @@ class App {
     const { longitude } = position.coords;
     // console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
 
-    const coords = [latitude, longitude]
+    const coords = [latitude, longitude];
 
+    // console.log(this);
     // Leaflet map api.... #map is like a properrty that is now defined on the object itself
     this.#map = L.map('map').setView(coords, 13);
     // console.log(map);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    }).addTo(this.#map);
 
 
 
     // Handling clicks on map
-    map.on('click', function (mapE) {
-      mapEvent = mapE;
-      // When click show form
-      form.classList.remove('hidden');
-      inputDistance.focus();
-
-    })
+    this.#map.on('click', this._showForm.bind(this))
 
   }
 
 
-  _showForm() {
-
+  _showForm(mapE) {
+    this.#mapEvent = mapE;
+    // When click show form
+    form.classList.remove('hidden');
+    inputDistance.focus();
   }
 
 
+
+  // form toggle
   _toggleElevationField() {
-
+    inputElevation.closest('.form__row').classList.toggle('form_row--hidden')
+    inputCadence.closest('.form__row').classList.toggle('form_row--hidden')
   }
 
 
-  _newWorkour() {
 
+  // creates a new workout
+  _newWorkout(e) {
+    e.preventDefault();
+
+    // console.log(this);
+
+    // Clear input fields after submiting
+    inputDistance.value = inputDistance.value = inputCadence.value = inputElevation.value = '';
+
+    const { lat, lng } = this.#mapEvent.latlng;
+
+    // display marker
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(L.popup({
+        maxWidth: 250,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: 'running-popup',
+      }))
+      .setPopupContent('Workout')
+      .openPopup();
   }
 
 
@@ -99,7 +122,7 @@ class App {
 const app = new App();
 
 // call the app with position prop to get location
-app._getPosition();
+// app._getPosition();
 
 
 
@@ -107,35 +130,5 @@ app._getPosition();
 
 
 
-// listen to submit form
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-
-  // Clear input fields after submiting
-  inputDistance.value = inputDistance.value = inputCadence.value = inputElevation.value = '';
-
-  const { lat, lng } = mapEvent.latlng;
-
-  L.marker([lat, lng])
-    .addTo(map)
-    .bindPopup(L.popup({
-      maxWidth: 250,
-      minWidth: 100,
-      autoClose: false,
-      closeOnClick: false,
-      className: 'running-popup',
-    }))
-    .setPopupContent('Workout')
-    .openPopup();
-})
-
-
-
-
-inputType.addEventListener('change', () => {
-  inputElevation.closest('.form__row').classList.toggle('form_row--hidden')
-  inputCadence.closest('.form__row').classList.toggle('form_row--hidden')
-})
 
 
