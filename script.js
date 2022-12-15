@@ -60,7 +60,7 @@ class Cycling extends Workout {
 
 const run1 = new Running([39, -12], 5.2, 24, 178);
 const cycling1 = new Running([39, -12], 27, 95, 523);
-console.log(run1, cycling1);
+// console.log(run1, cycling1);
 
 
 
@@ -81,14 +81,13 @@ class App {
   // # means private instance properties
   #map;
   #mapEvent;
+  #workouts = [];
 
   // constructor get automatically called when its loaded
   constructor() {
     this._getPosition();
-
     // listen to submit form
     form.addEventListener('submit', this._newWorkout.bind(this))
-
     inputType.addEventListener('change', this._toggleElevationField)
   }
 
@@ -163,11 +162,8 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value
-
-
-    // Check if data is valid
-
-
+    const { lat, lng } = this.#mapEvent.latlng;
+    let workout;
 
     // If workout running, create running object
     if (type === 'running') {
@@ -180,8 +176,11 @@ class App {
         // !Number.isFinite(cadence)
         !validInputs(distance, duration, cadence) || !allPositive(distance, duration, cadence)
       ) {
-        return alert('Inputs have to be positive numbers!')
+        return alert('Inputs have to be positive numbers!');
       }
+
+      workout = new Running([lat, lng], distance, duration, cadence)
+
     }
 
     // If workout cycling, create cycling object
@@ -194,16 +193,19 @@ class App {
         return alert('Inputs have to be positive numbers!')
       }
 
+      workout = new Cycling([lat, lng], distance, duration, elevation)
     }
 
 
 
     // Add new object to workout array
+    this.#workouts.push(workout);
+    console.log(workout);
 
 
 
     // Render workout on map as a marker
-    const { lat, lng } = this.#mapEvent.latlng;
+
     // display marker
     L.marker([lat, lng])
       .addTo(this.#map)
