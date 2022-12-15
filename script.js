@@ -17,6 +17,59 @@ const inputElevation = document.querySelector('.form__input--elevation');
 // let mapEvent;
 
 
+
+class Workout {
+  date = new Date();
+  // use current date to use as id and use the last 10 numbers from the date
+  id = (new Date() + '').slice(-10)
+
+  constructor(coords, distance, duration) {
+    this.coords = coords;     // [lat,lng] array
+    this.distance = distance; // in km
+    this.duration = duration; // in min
+  }
+}
+
+
+
+class Running extends Workout {
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+
+    // call calcPace in constructor
+    this.calcPace();
+  }
+
+  // Calculate pace
+  calcPace() {
+    // min/kim
+    this.pace = this.duration / this.distance;
+    return this.pace
+  }
+}
+
+
+
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed()
+  }
+
+  calcSpeed() {
+    // km/hr
+    this.speed = this.distance / (this.duration / 60)
+
+    return this.speed
+  }
+}
+
+const run1 = new Running([39, -12])
+
+//////////////////////////////////////////////////////////
+// APPLICATION ARCHITECTURE
 class App {
   // # means private instance properties
   #map;
