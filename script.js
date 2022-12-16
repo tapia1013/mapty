@@ -9,7 +9,9 @@
 class Workout {
   date = new Date();
   // use current date to use as id and use the last 10 numbers from the date
-  id = (Date.now() + '').slice(-10)
+  id = (Date.now() + '').slice(-10);
+  clicks = 0;
+
 
   constructor(coords, distance, duration) {
     this.coords = coords;     // [lat,lng] array
@@ -23,6 +25,10 @@ class Workout {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
+  }
+
+  click() {
+    this.clicks++;
   }
 }
 
@@ -69,8 +75,8 @@ class Cycling extends Workout {
 }
 
 
-const run1 = new Running([39, -12], 5.2, 24, 178);
-const cycling1 = new Running([39, -12], 27, 95, 523);
+// const run1 = new Running([39, -12], 5.2, 24, 178);
+// const cycling1 = new Running([39, -12], 27, 95, 523);
 // console.log(run1, cycling1);
 
 
@@ -91,6 +97,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   // # means private instance properties
   #map;
+  #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
 
@@ -98,8 +105,9 @@ class App {
   constructor() {
     this._getPosition();
     // listen to submit form
-    form.addEventListener('submit', this._newWorkout.bind(this))
-    inputType.addEventListener('change', this._toggleElevationField)
+    form.addEventListener('submit', this._newWorkout.bind(this));
+    inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
 
@@ -115,7 +123,6 @@ class App {
 
 
   _loadMap(position) {
-
     // take coord out of object
     const { latitude } = position.coords;
     const { longitude } = position.coords;
@@ -125,7 +132,7 @@ class App {
 
     // console.log(this);
     // Leaflet map api.... #map is like a properrty that is now defined on the object itself
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
     // console.log(map);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -315,6 +322,28 @@ class App {
     // inserts html as sibling after form
     form.insertAdjacentHTML('afterend', html)
 
+  }
+
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+    console.log(workoutEl);
+
+    if (!workoutEl) return;
+
+    const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
+    console.log(workout);
+
+    //Builtin leaflet setView()
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1
+      }
+    })
+
+    // using the public interface
+    workout.click();
   }
 }
 
