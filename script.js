@@ -140,7 +140,13 @@ class App {
 
 
     // Handling clicks on map
-    this.#map.on('click', this._showForm.bind(this))
+    this.#map.on('click', this._showForm.bind(this));
+
+
+    // Render workoutMarker here cause of async await problems in _getLS
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    })
 
   }
 
@@ -368,8 +374,11 @@ class App {
     // change workouts to be the data
     this.#workouts = data;
 
+    // Render workout in list
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    })
   }
-  // 15 @10:44s
 
 }
 
