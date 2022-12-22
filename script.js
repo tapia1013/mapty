@@ -17,7 +17,6 @@ class Workout {
     this.coords = coords;     // [lat,lng] array
     this.distance = distance; // in km
     this.duration = duration; // in min
-
   }
 
 
@@ -370,7 +369,7 @@ class App {
     this.#workouts = data;
 
   }
-
+  // 15 @10:44s
 
 }
 
