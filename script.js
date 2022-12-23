@@ -17,7 +17,6 @@ class Workout {
     this.coords = coords;     // [lat,lng] array
     this.distance = distance; // in km
     this.duration = duration; // in min
-
   }
 
 
@@ -75,12 +74,6 @@ class Cycling extends Workout {
 }
 
 
-// const run1 = new Running([39, -12], 5.2, 24, 178);
-// const cycling1 = new Running([39, -12], 27, 95, 523);
-// console.log(run1, cycling1);
-
-
-
 
 //////////////////////////////////////////////////////////
 // APPLICATION ARCHITECTURE
@@ -103,7 +96,12 @@ class App {
 
   // constructor get automatically called when its loaded
   constructor() {
+    // Get user position
     this._getPosition();
+
+    // Get data from LocalStorage
+    this._getLocalStorage();
+
     // listen to submit form
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
@@ -142,7 +140,13 @@ class App {
 
 
     // Handling clicks on map
-    this.#map.on('click', this._showForm.bind(this))
+    this.#map.on('click', this._showForm.bind(this));
+
+
+    // Render workoutMarker here cause of async await problems in _getLS
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    })
 
   }
 
@@ -231,7 +235,7 @@ class App {
 
     // Add new object to workout array
     this.#workouts.push(workout);
-    console.log(workout);
+    // console.log(workout);
 
 
     // Render workout on map as a marker
@@ -246,6 +250,11 @@ class App {
 
     // Hide form + clear input fields after submiting
     this._hideForm();
+
+
+
+    // Set Local storage to all workouts
+    this._setLocalStorage();
 
 
   }
@@ -327,12 +336,12 @@ class App {
 
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
+    // console.log(workoutEl);
 
     if (!workoutEl) return;
 
     const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
-    console.log(workout);
+    // console.log(workout);
 
     //Builtin leaflet setView()
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
@@ -343,9 +352,43 @@ class App {
     })
 
     // using the public interface
-    workout.click();
+    // workout.click();
+  }
+
+
+  // set Local storage for workouts
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+
+  // Get LocalStorage
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    // console.log(data);
+
+    // If no data just return
+    if (!data) return;
+
+
+    // change workouts to be the data
+    this.#workouts = data;
+
+    // Render workout in list
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    })
+  }
+
+
+  // remove workout from localstorage
+  reset() {
+    localStorage.removeItem('workouts');
+    // reload page after reseting
+    location.reload();
   }
 }
+
 
 
 
@@ -355,5 +398,4 @@ const app = new App();
 
 // call the app with position prop to get location
 // app._getPosition();
-
 
