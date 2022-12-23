@@ -235,7 +235,7 @@ class App {
 
     // Add new object to workout array
     this.#workouts.push(workout);
-    console.log(workout);
+    // console.log(workout);
 
 
     // Render workout on map as a marker
@@ -336,12 +336,12 @@ class App {
 
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
+    // console.log(workoutEl);
 
     if (!workoutEl) return;
 
     const workout = this.#workouts.find(work => work.id === workoutEl.dataset.id);
-    console.log(workout);
+    // console.log(workout);
 
     //Builtin leaflet setView()
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
@@ -352,7 +352,7 @@ class App {
     })
 
     // using the public interface
-    workout.click();
+    // workout.click();
   }
 
 
@@ -365,7 +365,7 @@ class App {
   // Get LocalStorage
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-    console.log(data);
+    // console.log(data);
 
     // If no data just return
     if (!data) return;
@@ -380,6 +380,13 @@ class App {
     })
   }
 
+
+  // remove workout from localstorage
+  reset() {
+    localStorage.removeItem('workouts');
+    // reload page after reseting
+    location.reload();
+  }
 }
 
 
